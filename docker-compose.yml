@@ -21,12 +21,17 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   flume:
-    image: apache/flume:1.9.0
+    build:
+      context: ./flume
     container_name: flume
     depends_on:
       - kafka
     volumes:
       - ./logs:/logs
-      - ./flume/flume.conf:/flume-conf/flume.conf
+      - ./flume/flume.conf:/opt/flume/conf/flume.conf
     command: >
-      sh -c "flume-ng agent --conf /flume-conf --conf-file /flume-conf/flume.conf --name agent -Dflume.root.logger=INFO,console"
+      flume-ng agent
+      --conf /opt/flume/conf
+      --conf-file /opt/flume/conf/flume.conf
+      --name agent
+      -Dflume.root.logger=INFO,console
