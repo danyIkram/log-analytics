@@ -18,7 +18,7 @@ methods = ["INFO", "ERROR"]
 statuses = [200, 201, 400, 401, 404, 500]
 
 while True:
-    log = f"{datetime.now()} {random.choice(methods)} {random.choice(endpoints)} {random.choice(statuses)} generated log"
+    log = f"{datetime.now()} {random.choice(methods)} {random.choice(endpoints)} {random.choice(statuses)}"
     with open(log_file, "a") as f:
         f.write(log + "\n")
     print(log)
