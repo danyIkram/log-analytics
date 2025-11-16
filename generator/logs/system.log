@@ -1,0 +1,15 @@
+1	May	2	00:48:49	DEBUG	cupsd	13644	HighMem zone: 5328 pages, LIFO batch:13351	E50	HighMem zone: <*> pages, LIFO batch:<*>
+2	May	24	00:48:50	WARN	systemd	10828	Initializing random number generator: succeeded	E54	Initializing random number generator: succeeded
+3	Mar	1	00:48:51	DEBUG	cupsd	16274	Kerberos authentication failed	E61	Kerberos authentication failed
+4	May	4	00:48:52	INFO	cupsd	3819	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost= 192.168.1.96	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost= <*>
+5	Nov	22	00:48:52	DEBUG	kernel	29784	check pass; user unknown	E27	check pass; user unknown
+6	Apr	12	00:48:54	WARN	sshd(pam_unix)	10490	ROOT LOGIN ON tty2	E91	ROOT LOGIN ON tty2
+7	Aug	14	00:48:55	ERROR	systemd	33124	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost= 192.168.1.132 user=root	E18	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost= <*> user=root
+8	Jun	9	00:48:56	ERROR	sshd(pam_unix)	16887	Initializing random number generator: succeeded	E54	Initializing random number generator: succeeded
+9	Nov	24	00:48:58	WARN	cupsd	21205	HighMem zone: 2665 pages, LIFO batch:11957	E50	HighMem zone: <*> pages, LIFO batch:<*>
+1	Mar	5	00:49:37	DEBUG	sshd(pam_unix)	6155	Kerberos authentication failed	E61	Kerberos authentication failed
+2	Dec	28	00:49:38	WARN	auditd	34157	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.35	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
+3	Jul	22	00:49:39	ERROR	kernel	33350	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.83 user=root	E18	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*> user=root
+4	Jun	14	00:49:41	WARN	networkd	34338	HighMem zone: 9909 pages, LIFO batch:14991	E50	HighMem zone: <*> pages, LIFO batch:<*>
+5	Aug	3	00:49:42	INFO	kernel	19584	ROOT LOGIN ON random_val	E91	ROOT LOGIN ON <*>
+6	Mar	20	00:49:43	ERROR	networkd	8680	Kerberos authentication failed	E61	Kerberos authentication failed
