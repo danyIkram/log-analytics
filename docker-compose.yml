@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   # ===== ZOOKEEPER =====
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -9,25 +8,33 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
-      - "2181:2181"
+      - "22181:2181"
     networks:
       - bigdata
 
   # ===== KAFKA =====
   kafka:
     image: confluentinc/cp-kafka:7.4.0
+    hostname: kafka
     container_name: kafka
     depends_on:
       - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+
+      # Listeners
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+       # Required for single-broker setup
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
+      - "29092:29092"
     networks:
       - bigdata
-
   # ===== FLUME =====
   flume:
     build:
@@ -48,14 +55,22 @@ services:
       - bigdata
 
   # ===== HADOOP =====
+# ================================================
+# FIXED HDFS — NameNode + DataNode + YARN Services
+# ================================================
+
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
+    hostname: namenode
     restart: always
     environment:
-      - CLUSTER_NAME=hadoop
+      CLUSTER_NAME: "hadoop"
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      HDFS_CONF_dfs_replication: 1
+      #SERVICE_PRECONDITION: "datanode:9864"
     volumes:
-      - namenode_data:/hadoop/dfs/namenode
+      - namenode_data:/hadoop/dfs/name
     ports:
       - "9870:9870"
       - "9000:9000"
@@ -66,8 +81,11 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode
     restart: always
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      #SERVICE_PRECONDITION: "namenode:9870"
     volumes:
-      - datanode_data:/hadoop/dfs/datanode
+      - datanode_data:/hadoop/dfs/data
     ports:
       - "9864:9864"
     networks:
@@ -77,6 +95,10 @@ services:
     image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     container_name: resourcemanager
     restart: always
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      YARN_CONF_yarn_resourcemanager_hostname: resourcemanager
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
     ports:
       - "8088:8088"
     networks:
@@ -86,6 +108,9 @@ services:
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager
     restart: always
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
     networks:
       - bigdata
 
@@ -93,6 +118,9 @@ services:
     image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     container_name: historyserver
     restart: always
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
     volumes:
       - historyserver_data:/hadoop/yarn/timeline
     ports:
@@ -100,20 +128,21 @@ services:
     networks:
       - bigdata
 
-  # ===== HIVE METASTORE DATABASE =====
+  # ===== HIVE METASTORE (OFFICIAL) =====
   hive-metastore-postgresql:
-    image: postgres:12
+    image: postgres:13
     container_name: hive-metastore-postgresql
     environment:
       POSTGRES_DB: metastore
       POSTGRES_USER: hive
       POSTGRES_PASSWORD: hive
+    volumes:
+      - hive_pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - bigdata
 
-  # ===== HIVE METASTORE (OFFICIAL) =====
   hive-metastore:
     image: apache/hive:4.0.0
     container_name: hive-metastore
@@ -146,20 +175,20 @@ services:
       - bigdata
 
   # ===== SPARK =====
+
   spark-master:
     image: bde2020/spark-master:3.1.1-hadoop3.2
     container_name: spark-master
-    environment:
-      - INIT_DAEMON_STEP=setup_spark
-      - ENABLE_INIT_DAEMON=false
     ports:
       - "7077:7077"
       - "8080:8080"
-    depends_on:
-      - namenode
-      - resourcemanager
+    volumes:
+      - ./scripts:/opt/spark-apps/scripts
+    environment:
+      - SPARK_MODE=master
     networks:
       - bigdata
+
 
   spark-worker:
     image: bde2020/spark-worker:3.1.1-hadoop3.2
