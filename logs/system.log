@@ -16597,3 +16597,21 @@
 36	Mar	6	13:02:37	INFO	cupsd	41881	check pass; user unknown	E27	check pass; user unknown
 1	May	7	13:10:23	INFO	sshd	37035	ROOT LOGIN ON tty2	E91	ROOT LOGIN ON tty2
 2	Aug	26	13:10:24	WARN	cupsd	40742	check pass; user unknown	E27	check pass; user unknown
+1	Sep	11	14:39:13	WARN	sshd	47298	check pass; user unknown	E27	check pass; user unknown
+2	Oct	18	14:39:15	DEBUG	systemd	14384	Kerberos authentication failed for user guest	E61	Kerberos authentication failed for user <*>
+3	Sep	12	14:39:16	WARN	systemd	43666	check pass; user unknown	E27	check pass; user unknown
+4	Dec	25	14:39:17	ERROR	auditd	27543	Connection from 192.168.1.100 port 192.168.1.52	E100	Connection from <*> port <*>
+5	Sep	26	14:39:19	WARN	systemd	14218	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.170	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
+6	Apr	11	14:39:21	DEBUG	networkd	6748	Kerberos authentication failed for user test	E61	Kerberos authentication failed for user <*>
+7	Nov	27	14:39:22	WARN	systemd	48343	Initializing random number generator: succeeded	E54	Initializing random number generator: succeeded
+8	Aug	20	14:39:23	DEBUG	auditd	19007	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.30	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
+9	Feb	24	14:39:25	DEBUG	cupsd	34861	authentication failure; rhost=192.168.1.215 user=192.168.1.24	E18	authentication failure; rhost=<*> user=<*>
+10	Dec	2	14:39:27	DEBUG	sshd	34758	Connection from 192.168.1.183 port 192.168.1.108	E100	Connection from <*> port <*>
+11	Dec	5	14:39:28	ERROR	sshd	1629	check pass; user unknown	E27	check pass; user unknown
+12	Oct	21	14:39:29	DEBUG	sshd	36260	Connection from 192.168.1.224 port 192.168.1.153	E100	Connection from <*> port <*>
+13	Jul	21	14:39:31	INFO	cupsd	49184	Initializing random number generator: succeeded	E54	Initializing random number generator: succeeded
+14	Nov	21	14:39:33	DEBUG	networkd	10416	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.16	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
+15	Apr	2	14:39:34	WARN	kernel	38468	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.144	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
+16	Mar	11	14:39:35	DEBUG	systemd	31504	HighMem zone: 1135 pages, LIFO batch:8803	E50	HighMem zone: <*> pages, LIFO batch:<*>
+17	Jun	4	14:39:36	INFO	auditd	12305	Initializing random number generator: succeeded	E54	Initializing random number generator: succeeded
+18	Mar	22	14:39:38	INFO	sshd	23796	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=192.168.1.138	E16	authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
