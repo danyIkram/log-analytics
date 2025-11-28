@@ -121,6 +121,7 @@ services:
     environment:
       CORE_CONF_fs_defaultFS: hdfs://namenode:9000
       SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
+      
     volumes:
       - historyserver_data:/hadoop/yarn/timeline
     ports:
@@ -137,11 +138,18 @@ services:
       POSTGRES_USER: hive
       POSTGRES_PASSWORD: hive
     volumes:
-      - hive_pgdata:/var/lib/postgresql/data
+      #- hive_pgdata:/var/lib/postgresql/data
+      - hive-postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - bigdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hive"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   hive-metastore:
     image: apache/hive:4.0.0
@@ -152,13 +160,23 @@ services:
       HIVE_METASTORE_USER: hive
       HIVE_METASTORE_PASSWORD: hive
       SERVICE_NAME: metastore
+    volumes:
+      - ./drivers/postgresql-42.7.3.jar:/opt/hive/lib/postgresql-42.7.3.jar
     command: ["bash", "-c", "mkdir -p /tmp/hive && /opt/hive/bin/hive --service metastore"]
     depends_on:
-      - hive-metastore-postgresql
+      hive-metastore-postgresql:
+        condition: service_healthy
     ports:
       - "9083:9083"
     networks:
       - bigdata
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/0.0.0.0/9083 || exit 1'"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
 
   # ===== HIVE SERVER2 =====
   hive-server:
@@ -167,12 +185,17 @@ services:
     environment:
       SERVICE_NAME: hiveserver2
       HIVE_METASTORE_URI: thrift://hive-metastore:9083
+      CORE_CONF_fs_defaultFS: "hdfs://namenode:9000"
+      HDFS_CONF_dfs_replication: 1
+      CORE_CONF_hadoop_http_staticuser_user: "root"
     depends_on:
-      - hive-metastore
+      hive-metastore:
+        condition: service_healthy
     ports:
       - "10000:10000"
     networks:
       - bigdata
+  
 
   # ===== SPARK =====
 
@@ -184,8 +207,10 @@ services:
       - "8080:8080"
     volumes:
       - ./scripts:/opt/spark-apps/scripts
+      - ./hadoop-config:/etc/hadoop
     environment:
       - SPARK_MODE=master
+      - SPARK_EXTRA_CLASSPATH=/opt/spark/jars/spark-sql-kafka-0-10_2.12-3.1.1.jar:/opt/spark/jars/kafka-clients-2.8.0.jar
     networks:
       - bigdata
 
@@ -194,9 +219,12 @@ services:
     image: bde2020/spark-worker:3.1.1-hadoop3.2
     container_name: spark-worker
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
-    depends_on:
+      - "SPARK_MASTER=spark://spark-master:7077"
+      - "SPARK_EXTRA_CLASSPATH=/opt/spark/jars/spark-sql-kafka-0-10_2.12-3.1.1.jar:/opt/spark/jars/kafka-clients-2.8.0.jar"
       - spark-master
+    volumes:
+      - ./scripts:/opt/spark-apps/scripts
+      - ./hadoop-config:/etc/hadoop
     networks:
       - bigdata
 
@@ -208,6 +236,7 @@ volumes:
   historyserver_data:
   hive_pgdata:
   hive_warehouse:
+  hive-postgres-data:
 
 # ===== NETWORK =====
 networks:

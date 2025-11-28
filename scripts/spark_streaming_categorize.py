@@ -43,6 +43,10 @@ HDFS_PATH_CLASSIFIED = f"{HDFS_NN}/logs/processed_classified"
 CHECKPOINT_PATH = f"{HDFS_NN}/tmp/spark-checkpoint"
 CHECKPOINT_PATH_CLASSIFIED = f"{HDFS_NN}/tmp/spark-checkpoint-classified"
 
+CHECKPOINT_KAFKA = f"{HDFS_NN}/tmp/spark-checkpoint-kafka-parsed"
+CHECKPOINT_PROCESSED = f"{HDFS_NN}/tmp/spark-checkpoint-processed"
+CHECKPOINT_PROCESSED_CLASSIFIED = f"{HDFS_NN}/tmp/spark-checkpoint-processed-classified"
+
 # ===== SPARK SESSION =====
 spark = SparkSession.builder \
     .appName("LogAnalytics-Streaming-ErrorCategorization") \
@@ -61,6 +65,7 @@ raw_stream = spark.readStream \
     .option("kafka.bootstrap.servers", KAFKA_BROKER) \
     .option("subscribe", RAW_TOPIC) \
     .option("startingOffsets", "latest") \
+    .option("kafka.group.id", "spark-categorizer-group") \
     .option("failOnDataLoss", "false") \
     .load()
 
@@ -104,7 +109,7 @@ hdfs_query = classified_df.writeStream \
     .outputMode("append") \
     .format("parquet") \
     .option("path", HDFS_PATH_CLASSIFIED) \
-    .option("checkpointLocation", CHECKPOINT_PATH_CLASSIFIED) \
+    .option("checkpointLocation", CHECKPOINT_PROCESSED_CLASSIFIED) \
     .partitionBy("date") \
     .trigger(processingTime="10 seconds") \
     .start()
@@ -116,10 +121,12 @@ kafka_query = kafka_output.writeStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", KAFKA_BROKER) \
     .option("topic", PARSED_TOPIC) \
-    .option("checkpointLocation", CHECKPOINT_PATH_CLASSIFIED + "-kafka") \
+    .option("checkpointLocation", CHECKPOINT_KAFKA) \
     .trigger(processingTime="10 seconds") \
     .start()
 
 print("✅ ALL STREAMING QUERIES STARTED")
 print("Outputs:\n1. Console\n2. HDFS Parquet (partitioned by date)\n3. Kafka parsed-logs topic")
 spark.streams.awaitAnyTermination()
+
+#.option("checkpointLocation", CHECKPOINT_PATH_CLASSIFIED + "-kafka") \

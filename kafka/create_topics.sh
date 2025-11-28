@@ -2,7 +2,7 @@
 
 echo "Creating Kafka topics for Log Analytics System..."
 
-# Create RAW logs topic (optionnel si déjà créé)
+# Create RAW logs topic 
 docker exec kafka kafka-topics \
   --create \
   --topic raw-logs \

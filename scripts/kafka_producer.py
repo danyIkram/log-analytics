@@ -27,7 +27,10 @@ try:
         bootstrap_servers=KAFKA_BROKER,
         value_serializer=lambda v: v.encode('utf-8'),
         acks='all',  # Wait for all replicas to acknowledge
-        retries=3
+        retries=10,
+        linger_ms=50,
+        request_timeout_ms=30000,
+        api_version=(2,5,0)
     )
     print("✅ Connected to Kafka broker\n")
 except KafkaError as e:

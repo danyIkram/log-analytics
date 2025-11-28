@@ -32,8 +32,10 @@ docker exec namenode hdfs dfs -chmod -R 777 /logs 2>/dev/null || echo "Permissio
 docker exec namenode hdfs dfs -chmod -R 777 /tmp 2>/dev/null || echo "Permissions set or already correct"
 
 echo -e "\n9. Verify all HDFS directories:"
-docker exec namenode hdfs://namenode:9000/ dfs -ls -R /logs
-docker exec namenode hdfs://namenode:9000/ dfs -ls /tmp | grep checkpoints || echo "Checkpoint directories will be created by Spark"
+#docker exec namenode hdfs://namenode:9000/ dfs -ls -R /logs
+#docker exec namenode hdfs://namenode:9000/ dfs -ls /tmp | grep checkpoints || echo "Checkpoint directories will be created by Spark"
+docker exec namenode bash -c "hdfs dfs -ls /tmp | grep checkpoints || echo 'Checkpoint directories will be created by Spark'"
+docker exec namenode bash -c "hdfs dfs -ls /logs"
 
 echo -e "\n10. Check Spark Master UI:"
 echo "Open: http://localhost:8080"
